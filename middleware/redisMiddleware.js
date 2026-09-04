@@ -1,5 +1,5 @@
 // Import the configured Redis client
-const redisConfig = require("../helpers/redis.js");
+import redisConfig from "../helpers/redis.js";
 
 const cache = (keyPrefix) => {
   return async (req, res, next) => {
@@ -43,4 +43,4 @@ const cache = (keyPrefix) => {
   };
 };
 
-module.exports = cache;
+export default cache;

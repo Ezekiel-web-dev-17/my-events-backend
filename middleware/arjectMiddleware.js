@@ -1,5 +1,5 @@
 // Import the configured Arcjet instance from config/arcjet.js
-const aj = require("../config/arcjet");
+import aj from "../config/arcjet.js";
 
 // Define Arcjet middleware for Express (or any Node HTTP framework)
 const arcjetMiddleware = async (req, res, next) => {
@@ -36,4 +36,4 @@ const arcjetMiddleware = async (req, res, next) => {
 };
 
 // Export the middleware function so it can be applied to routes
-module.exports = arcjetMiddleware;
+export default arcjetMiddleware;

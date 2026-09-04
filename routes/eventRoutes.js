@@ -1,5 +1,6 @@
+import express from "express";
 // Import event controller functions
-const {
+import {
   getAllEvents, // Fetch all events
   getAllUpComingEvents, // Fetch all upcoming events
   createEvents, // Create a new event
@@ -7,20 +8,17 @@ const {
   deleteEvent, // Delete an event by ID
   cancelEvent, // Mark an event as cancelled
   filterEvent,
-  draftEvents,
   getEventById,
   getDraftEvents,
-  getDraftedEventById,
-  deleteDraftedEvent,
   getLiveEvents, // Filter events by query params
-} = require("../controllers/eventController");
+} from "../controllers/eventController.js";
 
 // Import middleware for checking admin authorization
-const { isAdmin, isUser } = require("../middleware/auth");
-const cache = require("../middleware/redisMiddleware");
+import { isAdmin, isUser } from "../middleware/auth.js";
+import cache from "../middleware/redisMiddleware.js";
 
 // Initialize an Express router instance
-const router = require("express").Router();
+const router = express.Router();
 
 // ----------------------------------------------------------------------
 // GET ROUTES (FIXED ORDER)
@@ -39,12 +37,8 @@ router.get("/drafts", cache("All draft events: "), getDraftEvents);
 // Fetch all live events and cache the response
 router.get("/live", cache("All live events: "), getLiveEvents);
 
-// Route: GET /api/events/upcoming?page=pageNumber
-// Fetch events with category = "upcoming" and cache the response with key "All upcoming events: params or query"
-
 // Route: GET /api/events/upcoming
 // Fetch events with category = "upcoming" and cache the response
-
 router.get("/upcoming", cache("All upcoming events: "), getAllUpComingEvents);
 
 // Route: GET /api/events/filterby?field=value
@@ -85,4 +79,4 @@ router.delete("/delete/:id", isUser, isAdmin, deleteEvent);
 router.get("/:id", cache("Event details: "), getEventById);
 
 // Export router so it can be used in server.js / app.js
-module.exports = router;
+export default router;

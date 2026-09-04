@@ -1,7 +1,7 @@
-const nodemailer = require("nodemailer");
-const { createWelcomeEmail } = require("./googleMailTemplate");
+import nodemailer from "nodemailer";
+import { createWelcomeEmail } from "./googleMailTemplate.js";
 
-const sendGoogleWelcomeEmail = async ({ firstname, email }) => {
+export const sendGoogleWelcomeEmail = async ({ firstname, email }) => {
   // Configure mail transporter
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -31,6 +31,6 @@ const sendGoogleWelcomeEmail = async ({ firstname, email }) => {
   }
 };
 
-module.exports = {
+export default {
   sendGoogleWelcomeEmail,
 };

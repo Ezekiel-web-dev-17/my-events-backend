@@ -1,8 +1,7 @@
-const TicketInstance = require('../models/ticketIntanceSchema');
-const generateQrCode = require('../helpers/qrCode'); // Assuming the path is correct
-const mongoose = require('mongoose');
-const crypto = require("crypto");
-
+import TicketInstance from "../models/ticketIntanceSchema.js";
+import generateQrCode from "../helpers/qrCode.js";
+import mongoose from "mongoose";
+import crypto from "crypto";
 
 // --- Helper Functions (Exported for testing or kept private if only used here) ---
 
@@ -10,7 +9,7 @@ const crypto = require("crypto");
  * Generate globally unique ticket number using the payment's unique reference part.
  * Reference format: TKT_{ticketId}_{timestamp}_{userId}
  */
-const generateTicketNumber = (reference, sequenceNumber) => {
+export const generateTicketNumber = (reference, sequenceNumber) => {
     // We use the timestamp part of the reference (index 2) as the unique ID base.
     const parts = reference.split('_');
     const uniqueTimestampPart = parts.length > 2 ? parts[2] : Date.now().toString(); 
@@ -26,14 +25,15 @@ const generateTicketNumber = (reference, sequenceNumber) => {
     // This is unique for every transaction and every sequence number within it.
     return `REF-${uniqueBaseID}-${formattedSequence}`;
 };
+
 /**
  * Generate secure token for ticket verification
  */
-const generateSecureToken = () => {
+export const generateSecureToken = () => {
     return crypto.randomBytes(32).toString('hex');
 };
 
-const generateTicketInstances = async (payment, specificTicket, user, event, session) => {
+export const generateTicketInstances = async (payment, specificTicket, user, event, session) => {
     const ticketsToCreate = [];
     const quantity = payment.quantity;
     const eventId = payment.event; // The ID of the parent Event
@@ -43,7 +43,6 @@ const generateTicketInstances = async (payment, specificTicket, user, event, ses
     }
 
     for (let i = 0; i < quantity; i++) {
-        
         const ticketNumber = generateTicketNumber(payment.reference, i + 1);
         const ticketToken = generateSecureToken();
 
@@ -86,9 +85,8 @@ const generateTicketInstances = async (payment, specificTicket, user, event, ses
     return createdTicketInstances;
 };
 
-module.exports = {
+export default {
     generateTicketInstances,
-    // Export helpers if you need them for testing, otherwise they can stay internal.
     generateTicketNumber, 
     generateSecureToken,
 };

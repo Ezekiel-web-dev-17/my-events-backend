@@ -1,17 +1,14 @@
-const express = require("express");
-const {
+import express from "express";
+import {
     createTestimonial,
     getTestimonials,
     deleteTestimonial,
-} = require("../controllers/testimonialController.js")
+} from "../controllers/testimonialController.js";
 
 const router = express.Router();
 
-
 router.get("/", getTestimonials);
 router.post("/create", createTestimonial);
-
-
 router.delete("/:id", deleteTestimonial);
 
-module.exports = router;
+export default router;

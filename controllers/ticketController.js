@@ -1,7 +1,7 @@
-const express = require("express");
-const mongoose = require("mongoose")
-const EVENTS = require("../models/eventSchema.js");
-const Ticket = require("../models/ticketSchema.js");
+import express from "express";
+import mongoose from "mongoose";
+import EVENTS from "../models/eventSchema.js";
+import Ticket from "../models/ticketSchema.js";
 
 // Create different types of tickets for a single event
 const handleCreateTicket = async (req, res, next) => {
@@ -263,7 +263,15 @@ const handleClearEventTickets = async (req, res) => {
   });
 };
 
-module.exports = {
+export {
+  handleCreateTicket,
+  handleUpdateTicket,
+  handleDeleteTicket,
+  handleGetAllTicket,
+  handleClearEventTickets,
+};
+
+export default {
   handleCreateTicket,
   handleUpdateTicket,
   handleDeleteTicket,

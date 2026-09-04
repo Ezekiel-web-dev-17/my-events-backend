@@ -1,27 +1,27 @@
-// // utils/verifyPaymentSuccess.js
-// const paymentSchema = require("../models/paymentSchema");
-// const ticketSchema = require("../models/ticketSchema");
+// utils/verifyPaymentSuccess.js
+import paymentSchema from "../models/paymentSchema.js";
+import ticketSchema from "../models/ticketSchema.js";
 
-// const processSuccessfulPayment = async (reference, gatewayData) => {
-//   const payment = await paymentSchema.findOne({ reference }).populate("ticket");
-//   if (!payment) return null;
-//   if (payment.status === "success") return payment; // already processed
+export const processSuccessfulPayment = async (reference, gatewayData) => {
+  const payment = await paymentSchema.findOne({ reference }).populate("ticket");
+  if (!payment) return null;
+  if (payment.status === "success") return payment; // already processed
 
-//   payment.status = "success";
-//   payment.paidAt = new Date();
-//   payment.gatewayResponse = gatewayData;
-//   await payment.save();
+  payment.status = "success";
+  payment.paidAt = new Date();
+  payment.gatewayResponse = gatewayData;
+  await payment.save();
 
-//   const ticket = payment.ticket;
-//   const purchasedQuantity = payment.quantity;
+  const ticket = payment.ticket;
+  const purchasedQuantity = payment.quantity;
 
-//   if (ticket.quantity >= purchasedQuantity) {
-//     ticket.quantity -= purchasedQuantity;
-//     if (ticket.quantity === 0) ticket.status = "sold out";
-//     await ticket.save();
-//   }
+  if (ticket && ticket.quantity >= purchasedQuantity) {
+    ticket.quantity -= purchasedQuantity;
+    if (ticket.quantity === 0) ticket.status = "sold out";
+    await ticket.save();
+  }
 
-//   return payment;
-// };
+  return payment;
+};
 
-// module.exports = {processSuccessfulPayment};
+export default { processSuccessfulPayment };

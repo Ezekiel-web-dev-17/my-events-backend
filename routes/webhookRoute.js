@@ -1,6 +1,8 @@
-const router = require("express").Router()
-const {handleWebhookNotification}=require("../controllers/webhookController")
+import express from "express";
+import { handleWebhookNotification } from "../controllers/webhookController.js";
 
-router.post("/webhooks", handleWebhookNotification)
+const router = express.Router();
 
-module.exports = router
+router.post("/webhooks", handleWebhookNotification);
+
+export default router;

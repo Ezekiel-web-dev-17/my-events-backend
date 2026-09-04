@@ -1,14 +1,15 @@
-const router = require("express").Router();
-const {
+import express from "express";
+import {
   handlePaymentInitialization,
   handlePaymentVerification,
   handleAllTransactions,
   handleUserTicket,
   getSalesOverview,
   handleAllTickets,
-} = require("../controllers/paymentsController");
+} from "../controllers/paymentsController.js";
+import { isAdmin, isUser, isSuperAdmin } from "../middleware/auth.js";
 
-const { isAdmin, isUser, isSuperAdmin } = require("../middleware/auth");
+const router = express.Router();
 
 router.post("/initialize/:ticketId", isUser, handlePaymentInitialization);
 router.get("/verify", handlePaymentVerification);
@@ -17,4 +18,4 @@ router.get("/myTicket", isUser, handleUserTicket);
 router.get("/allTicket", isUser, isAdmin, handleAllTickets);
 router.get("/revenue", isUser, isSuperAdmin, getSalesOverview);
 
-module.exports = router;
+export default router;

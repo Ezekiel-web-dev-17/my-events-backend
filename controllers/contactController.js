@@ -1,6 +1,6 @@
-const nodemailer = require("nodemailer");
-const { contactEmailReply } = require("../emails/emailtemplate");
-const sgMail = require("@sendgrid/mail");
+import nodemailer from "nodemailer";
+import { contactEmailReply } from "../emails/emailtemplate.js";
+import sgMail from "@sendgrid/mail";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const sendEmail = async ({ to, subject, html }) => {
@@ -22,7 +22,7 @@ const sendEmail = async ({ to, subject, html }) => {
   }
 };
 
-exports.handleContactForm = async (req, res) => {
+export const handleContactForm = async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
@@ -31,14 +31,6 @@ exports.handleContactForm = async (req, res) => {
         .status(400)
         .json({ success: false, message: "All fields are required" });
     }
-
-    // const transporter = nodemailer.createTransport({
-    //     service: "gmail",
-    //     auth: {
-    //         user: process.env.EMAIL,
-    //         pass: process.env.PASSWORD,
-    //     },
-    // });
 
     await sendEmail({
       from: email,
@@ -66,3 +58,5 @@ exports.handleContactForm = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to send message" });
   }
 };
+
+export default { handleContactForm };

@@ -158,4 +158,5 @@ const resetEmailTemplate = (firstname, clientUrl) => {
 </html>`;
 };
 
-module.exports = { createWelcomeEmail, resetEmailTemplate };
+export { createWelcomeEmail, resetEmailTemplate };
+export default { createWelcomeEmail, resetEmailTemplate };

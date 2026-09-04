@@ -1,12 +1,12 @@
-const nodemailer = require("nodemailer");
-const {
+import nodemailer from "nodemailer";
+import {
   createWelcomeEmail,
   resetEmailTemplate,
   PaymentComfirmationEmail,
   sendUserTicket,
   createAdminEmail,
-} = require("./emailtemplate");
-const sgMail = require("@sendgrid/mail");
+} from "./emailtemplate.js";
+import sgMail from "@sendgrid/mail";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -109,35 +109,39 @@ const sendPaymentConfirmationEmail = async ({
   });
 };
 
-// module.exports = {
-//   sendWelcomeEmail,
-//   sendResetEmail,
-//   sendPaymentConfirmationEmail,
-// };
 const sendTicket = async ({
-    email,
-    lastname,
-    ticketDetails,
-    account,
+  email,
+  lastname,
+  ticketDetails,
+  account,
 }) => {
-    const subject = "Eventra Ticket Details";
-    
-   
-    // --- 2. Generate HTML with CID Reference ---
-    const html = sendUserTicket(
-        lastname,      
-        ticketDetails,
-        account,
-    );
+  const subject = "Eventra Ticket Details";
 
-    // --- 3. Send Email with Attachments ---
-    sendEmail({
-        to: email,
-        subject,
-        html,
-    });
+
+  // --- 2. Generate HTML with CID Reference ---
+  const html = sendUserTicket(
+    lastname,
+    ticketDetails,
+    account,
+  );
+
+  // --- 3. Send Email with Attachments ---
+  sendEmail({
+    to: email,
+    subject,
+    html,
+  });
 };
-module.exports = {
+
+export {
+  sendWelcomeEmail,
+  sendResetEmail,
+  sendPaymentConfirmationEmail,
+  sendTicket,
+  sendAdminEmail,
+};
+
+export default {
   sendWelcomeEmail,
   sendResetEmail,
   sendPaymentConfirmationEmail,

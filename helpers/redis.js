@@ -2,7 +2,7 @@
 // Instead of hitting MongoDB for every request (which is slower and costly),
 // we store frequently accessed data in Redis and fetch it from the cache first.
 
-const { default: Redis } = require("ioredis"); // Import Redis client (ioredis library)
+import Redis from "ioredis"; // Import Redis client (ioredis library)
 
 // Create a Redis client instance with connection details from environment variables
 const redisConfig = new Redis({
@@ -29,4 +29,4 @@ redisConfig.on("error", (err) => {
 });
 
 // Export the Redis client instance so other parts of the app can use it
-module.exports = redisConfig;
+export default redisConfig;

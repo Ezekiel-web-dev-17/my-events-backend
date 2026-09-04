@@ -1,9 +1,8 @@
-const crypto = require("crypto");
-const {processSuccessfulPayment} = require("../helpers/verifyPaymentSuccess")
-const {sendPaymentConfirmationEmail} = require("../emails/sendemails")
+import crypto from "crypto";
+import { processSuccessfulPayment } from "../helpers/verifyPaymentSuccess.js";
+import { sendPaymentConfirmationEmail } from "../emails/sendemails.js";
 
-
-const handleWebhookNotification = async (req, res) => {
+export const handleWebhookNotification = async (req, res, next) => {
   const secret = process.env.PAYSTACK_SECRET_KEY;
   const hash = crypto
     .createHmac("sha512", secret)
@@ -12,8 +11,8 @@ const handleWebhookNotification = async (req, res) => {
 
   if (hash !== req.headers["x-paystack-signature"]) {
     return res.status(401).json({
-        success:"false",
-        meassage:'"Invalid signature"'
+      success: "false",
+      message: "Invalid signature",
     });
   }
 
@@ -23,13 +22,12 @@ const handleWebhookNotification = async (req, res) => {
     if (event === "charge.success") {
       await processSuccessfulPayment(data.reference, data);
     }
-   
+
     res.status(200).send("Webhook processed");
-
-    
   } catch (error) {
-     next(error)
+    if (next) next(error);
+    else res.status(500).json({ error: error.message });
   }
-}
+};
 
-module.exports = {handleWebhookNotification}
+export default { handleWebhookNotification };

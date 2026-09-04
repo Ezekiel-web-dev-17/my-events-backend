@@ -1,8 +1,4 @@
-// Import the default Arcjet function (for creating an Arcjet instance)
-const arcjet = require("@arcjet/node").default;
-
-// Import specific built-in rules: shield, detectBot, and tokenBucket
-const { shield, detectBot, tokenBucket } = require("@arcjet/node");
+import arcjet, { shield, detectBot, tokenBucket } from "@arcjet/node";
 
 // Create an Arcjet instance with configuration
 const aj = arcjet({
@@ -46,4 +42,4 @@ const aj = arcjet({
 });
 
 // Export the Arcjet instance so it can be used in routes or middleware
-module.exports = aj;
+export default aj;

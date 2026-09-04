@@ -1,15 +1,14 @@
-const USER = require("../models/usersSchema");
-const bcrypt = require("bcryptjs");
-const cloudinary = require("cloudinary").v2;
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const generateToken = require("../helpers/generateToken");
-const {
+import USER from "../models/usersSchema.js";
+import bcrypt from "bcryptjs";
+import { v2 as cloudinary } from "cloudinary";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import generateToken from "../helpers/generateToken.js";
+import {
   sendWelcomeEmail,
   sendResetEmail,
   sendAdminEmail,
-} = require("../emails/sendemails");
-const { use } = require("passport");
+} from "../emails/sendemails.js";
 
 // registration controller
 const handleRegister = async (req, res) => {
@@ -455,7 +454,23 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
+  handleRegister,
+  handleVerifyEmail,
+  userLogin,
+  resendVerificationEmail,
+  handleForgotPassword,
+  handleResetPassword,
+  handleChangePassword,
+  getAllUsers,
+  handleGetUser,
+  handleUpdateUser,
+  createAdmin,
+  getAllAdmin,
+  deleteAdmin,
+};
+
+export default {
   handleRegister,
   handleVerifyEmail,
   userLogin,

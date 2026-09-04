@@ -1,7 +1,7 @@
 // controllers/googleAuth.js
-const jwt = require("jsonwebtoken");
-const User = require("../models/usersSchema");
-const { sendGoogleWelcomeEmail } = require("../emails/googleSendMail");
+import jwt from "jsonwebtoken";
+import User from "../models/usersSchema.js";
+import { sendGoogleWelcomeEmail } from "../emails/googleSendMail.js";
 
 /**
  * Handles the Google OAuth callback.
@@ -144,4 +144,5 @@ const finalizeGoogle = async (req, res) => {
   }
 };
 
-module.exports = { googleCallback, finalizeGoogle };
+export { googleCallback, finalizeGoogle };
+export default { googleCallback, finalizeGoogle };

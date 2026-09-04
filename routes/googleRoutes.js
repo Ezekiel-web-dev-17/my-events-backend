@@ -1,7 +1,7 @@
-const express = require("express");
-const passport = require("passport");
-const { googleCallback, finalizeGoogle } = require("../controllers/googleAuth");
-const User = require("../models/usersSchema");
+import express from "express";
+import passport from "passport";
+import { googleCallback, finalizeGoogle } from "../controllers/googleAuth.js";
+import User from "../models/usersSchema.js";
 
 const router = express.Router();
 
@@ -24,4 +24,4 @@ router.get(
 // Step 3: Finalize Google login/signup after user selects email
 router.post("/google/finalize", finalizeGoogle);
 
-module.exports = router;
+export default router;

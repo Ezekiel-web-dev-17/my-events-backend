@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
     user: {
@@ -55,4 +55,4 @@ const paymentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const PAYMENT = mongoose.model("ticketPayment", paymentSchema);
-module.exports = PAYMENT;
+export default PAYMENT;

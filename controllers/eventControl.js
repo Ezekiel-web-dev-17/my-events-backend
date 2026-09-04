@@ -1,10 +1,10 @@
-const EVENTS = require("../models/eventsSchemaa");
-const cloudinary = require("cloudinary").v2;
-const {
+import EVENTS from "../models/eventsSchemaa.js";
+import { v2 as cloudinary } from "cloudinary";
+import {
   combineDateAndTime,
   parseFlexibleTimeTo24,
-} = require("../helpers/combineDateandTime");
-const { makeMessage } = require("./notifications");
+} from "../helpers/combineDateandTime.js";
+import { makeMessage } from "./notifications.js";
 
 // Creating events
 const createEvents = async (req, res) => {
@@ -444,7 +444,15 @@ const deleteEvent = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
+  createEvents,
+  getAllEvents,
+  getSingleEvent,
+  updateEvent,
+  deleteEvent,
+};
+
+export default {
   createEvents,
   getAllEvents,
   getSingleEvent,

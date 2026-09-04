@@ -1,7 +1,9 @@
-const router = require("express").Router()
-const {verifyTicketScan} = require("../controllers/verifyQrcode")
-const { isAdmin, isUser } = require("../middleware/auth");
+import express from "express";
+import { verifyTicketScan } from "../controllers/verifyQrcode.js";
+import { isAdmin, isUser } from "../middleware/auth.js";
 
-router.post("/verifyQrcode",isUser,isAdmin, verifyTicketScan)
+const router = express.Router();
 
-module.exports = router
+router.post("/verifyQrcode", isUser, isAdmin, verifyTicketScan);
+
+export default router;

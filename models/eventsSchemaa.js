@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
-const {
+import mongoose from "mongoose";
+import {
   combineDateAndTime,
   parseFlexibleTimeTo24,
   formatTimeToAmPm,
-} = require("../helpers/combineDateandTime");
+} from "../helpers/combineDateandTime.js";
 
 const TicketSchema = new mongoose.Schema(
   {
@@ -191,4 +191,4 @@ EventSchema.pre("save", function (next) {
 
 const EVENTS = mongoose.model("Eventra", EventSchema);
 
-module.exports = EVENTS;
+export default EVENTS;

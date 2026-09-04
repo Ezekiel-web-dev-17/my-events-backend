@@ -1,6 +1,6 @@
-const QRCode = require("qrcode");
+import QRCode from "qrcode";
 
-const generateQrCode = async ({ event, ticketNumber, token }) => {
+export const generateQrCode = async ({ event, ticketNumber, token }) => {
   // Destructure token from the input object
   if (!token) {
     throw new Error("Token is required for QR code generation.");
@@ -33,4 +33,4 @@ const generateQrCode = async ({ event, ticketNumber, token }) => {
   }
 };
 
-module.exports = generateQrCode;
+export default generateQrCode;

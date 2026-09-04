@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ticketInstanceSchema = new mongoose.Schema(
   {
@@ -80,4 +80,4 @@ ticketInstanceSchema.index({ event: 1, ticketNumber: 1 });
 
 
 const TICKETINSTANCE = mongoose.model("TicketInstance", ticketInstanceSchema);
-module.exports = TICKETINSTANCE
+export default TICKETINSTANCE;

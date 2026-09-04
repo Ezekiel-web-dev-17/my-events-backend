@@ -1,18 +1,19 @@
-const paymentSchema = require("../models/paymentSchema");
-const mongoose = require("mongoose");
-// const ticketSchema = require("../models/ticketSchema");
-const userSchema = require("../models/usersSchema");
-const EVENTS = require("../models/eventsSchemaa");
-const ticketInstanceSchema = require("../models/ticketIntanceSchema");
-const paystack = require("paystack")(process.env.PAYSTACK_SECRET_KEY);
-// const { processSuccessfulPayment } = require("../helpers/verifyPaymentSuccess");
-const {
+import paymentSchema from "../models/paymentSchema.js";
+import mongoose from "mongoose";
+import userSchema from "../models/usersSchema.js";
+import EVENTS from "../models/eventsSchemaa.js";
+import ticketInstanceSchema from "../models/ticketIntanceSchema.js";
+import {
   sendPaymentConfirmationEmail,
   sendTicket,
-} = require("../emails/sendemails");
-const { generateTicketInstances } = require("../helpers/ticketInstance");
-const redirectToFrontend = require("../helpers/redirect");
-const { makeMessage } = require("./notifications");
+} from "../emails/sendemails.js";
+import { generateTicketInstances } from "../helpers/ticketInstance.js";
+import redirectToFrontend from "../helpers/redirect.js";
+import { makeMessage } from "./notifications.js";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const paystack = require("paystack")(process.env.PAYSTACK_SECRET_KEY);
 
 const baseUrl = process.env.BACKEND_URL.replace(/\/$/, "");
 
@@ -942,7 +943,16 @@ const getSalesOverview = async (req, res, next) => {
   }
 };
 // test
-module.exports = {
+export {
+  handlePaymentInitialization,
+  handlePaymentVerification,
+  handleAllTransactions,
+  handleUserTicket,
+  getSalesOverview,
+  handleAllTickets,
+};
+
+export default {
   handlePaymentInitialization,
   handlePaymentVerification,
   handleAllTransactions,

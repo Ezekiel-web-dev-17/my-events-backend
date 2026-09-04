@@ -1,5 +1,5 @@
-const router = require("express").Router();
-const {
+import express from "express";
+import {
   handleRegister,
   userLogin,
   handleVerifyEmail,
@@ -13,8 +13,10 @@ const {
   createAdmin,
   getAllAdmin,
   deleteAdmin,
-} = require("../controllers/userController");
-const { isUser, isAdmin, isSuperAdmin } = require("../middleware/auth");
+} from "../controllers/userController.js";
+import { isUser, isAdmin, isSuperAdmin } from "../middleware/auth.js";
+
+const router = express.Router();
 
 router.post("/register", handleRegister);
 router.post("/login", userLogin);
@@ -30,4 +32,4 @@ router.post("/create-admin", isUser, isSuperAdmin, createAdmin);
 router.get("/all-admin", isUser, isSuperAdmin, getAllAdmin);
 router.delete("/delete-admin/:id", isUser, isSuperAdmin, deleteAdmin);
 
-module.exports = router;
+export default router;

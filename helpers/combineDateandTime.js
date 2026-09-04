@@ -1,5 +1,5 @@
 //  Convert any flexible time input → 24-hour format ("HH:mm")
-const parseFlexibleTimeTo24 = (timeStr) => {
+export const parseFlexibleTimeTo24 = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return "";
 
   const cleaned = timeStr.trim().toUpperCase();
@@ -30,7 +30,7 @@ const parseFlexibleTimeTo24 = (timeStr) => {
 };
 
 // Convert 24-hour ("HH:mm") → 12-hour ("hh:mm AM/PM")
-const formatTimeToAmPm = (time) => {
+export const formatTimeToAmPm = (time) => {
   if (!time || typeof time !== "string") return "";
   const [hourStr, minute] = time.split(":");
   let hour = parseInt(hourStr, 10);
@@ -42,14 +42,14 @@ const formatTimeToAmPm = (time) => {
 };
 
 // Helper function to combine date and time into a single Date object
-const combineDateAndTime = (date, timeStr) => {
+export const combineDateAndTime = (date, timeStr) => {
   const [hour, minute] = timeStr.split(":").map(Number);
   const combined = new Date(date);
   combined.setHours(hour, minute, 0, 0);
   return combined;
 };
 
-module.exports = {
+export default {
   parseFlexibleTimeTo24,
   formatTimeToAmPm,
   combineDateAndTime,

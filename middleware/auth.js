@@ -1,13 +1,13 @@
 // Import JSON Web Token library
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 // Import User model
-const USER = require("../models/usersSchema");
+import USER from "../models/usersSchema.js";
 
 /* ========================
    MIDDLEWARE: Check if User
    ======================== */
-const isUser = async (req, res, next) => {
+export const isUser = async (req, res, next) => {
   try {
     let token;
 
@@ -55,7 +55,7 @@ const isUser = async (req, res, next) => {
 /* ========================
    MIDDLEWARE: Check if Admin
    ======================== */
-const isAdmin = async (req, res, next) => {
+export const isAdmin = async (req, res, next) => {
   try {
     const user = req.user; // User should already be attached by isUser middleware
 
@@ -75,8 +75,9 @@ const isAdmin = async (req, res, next) => {
     next(error);
   }
 };
+
 // for superadmins only
-const isSuperAdmin = async (req, res, next) => {
+export const isSuperAdmin = async (req, res, next) => {
   try {
     const user = req.user;
     if (!user) {
@@ -96,4 +97,4 @@ const isSuperAdmin = async (req, res, next) => {
 /* ========================
    EXPORT MIDDLEWARES
    ======================== */
-module.exports = { isUser, isAdmin, isSuperAdmin };
+export default { isUser, isAdmin, isSuperAdmin };

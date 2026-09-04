@@ -308,100 +308,6 @@ const contactEmailReply = (firstname) => {
 </html>`;
 };
 
-// const PaymentComfirmationEmail = (
-//   lastname,
-//   reference,
-//   amount,
-//   currency,
-//   ticketDetails,
-//   ticketUrl
-// ) => {
-//   const ticketButtonHTML = `
-//         <div style="text-align: center; margin: 30px 0;">
-//             <a href="${ticketUrl}" 
-//               clicktracking="off" target="_blank" 
-//                style="
-//                   display: inline-block; 
-//                   padding: 12px 25px; 
-//                   background-color: #045854; 
-//                   color: #ffffff; 
-//                   text-decoration: none; 
-//                   border-radius: 5px; 
-//                   font-weight: bold;
-//                "
-//             >
-//                 VIEW MY TICKETS
-//             </a>
-//             <p style="margin-top: 15px; font-size: 14px; color: #666;">
-//                 Or, go directly to your dashboard to view your purchase.
-//             </p>
-//         </div>
-//     `;
-//   const displayAmount = amount.toFixed(2);
-
-//   return `
-//     <html>
-//       <body 
-//         style="
-//         font-family: Arial, sans-serif;
-//         line-height: 1.6;
-//         color: #333;
-//         max-width: 600px;
-//         margin: 0 auto;
-//         padding: 20px;
-//       ">
-//        <div
-//           style="display: flex; justify-content: center; align-items: center; background-color: #045854; margin: 20px 0;"
-//         >
-//           <img
-//             src="https://res.cloudinary.com/dgvucesc6/image/upload/Frame_2121455760_fj8zmx.png"
-//             alt="eventra"
-//              style="
-//             max-width: 700.3px;
-//             max-height: 43.92px;
-//             margin-bottom: 20px;
-//             border-radius: 5px;
-//           "
-//           />
-//         </div>
-//           
-//         <p>Thank you for your purchase! Your order is confirmed.</p>
-
-//         <p style="font-size: 18px; color: #000000">
-//         <strong>Hello ${lastname},</strong>
-//       </p>
-//       
-        
-//         ${ticketButtonHTML}
-
-
-//       <div
-//         style="
-//           background-color: #f3f6f8;
-//           padding: 10px;
-//           border-radius: 8px;
-//           margin: 20px 0;
-//         "
-//       >
-//         
-//         <h2>Order Details</h2>
-//         
-//                 <p><strong>Transaction Reference:</strong> ${reference}</p>
-//         <p><strong>Amount Paid:</strong> ${currency} ${displayAmount}</p>
-//         
-//         <p><strong>Event:</strong> ${ticketDetails.eventName}</p>
-//         <p><strong>Tickets Purchased:</strong> ${ticketDetails.quantity}</p>
-//         
-//         <p>Your tickets for ${ticketDetails.eventName} are now attached in your user dashboard.</p>
-//         <p>Thank you,<br>The Eventra Team</p>
-//       </div>
-
-//       </body>
-//     </html>
-//   `;
-// };
-
-
 const PaymentComfirmationEmail = (
   lastname,
   reference,
@@ -585,9 +491,8 @@ const PaymentComfirmationEmail = (
                 color: #856404;
                 line-height: 1.6;
               ">
-                💡 <strong>Tip:</strong> Your tickets for <strong>${
-                  ticketDetails.eventName
-                }</strong> are now available in your dashboard. We recommend downloading or saving them before the event.
+                💡 <strong>Tip:</strong> Your tickets for <strong>${ticketDetails.eventName
+    }</strong> are now available in your dashboard. We recommend downloading or saving them before the event.
               </p>
             </div>
 
@@ -633,120 +538,6 @@ const PaymentComfirmationEmail = (
   `;
 };
 
-// const sendUserTicket = (lastname, ticketDetails, account) => {
-//   if (!ticketDetails || !Array.isArray(ticketDetails.generatedTickets)) {
-//     console.error(
-//       "sendUserTicket failed: generatedTickets is missing or not an array."
-//     );
-//     return "Ticket generation failed. Please contact support.";
-//   }
-
-//   const displayDate = new Date(ticketDetails.eventDate).toLocaleDateString(
-//     "en-US",
-//     {
-//       weekday: "long",
-//       year: "numeric",
-//       month: "long",
-//       day: "numeric",
-//       hour: "2-digit",
-//       minute: "2-digit",
-//     }
-//   );
-
-//   const ticketListHTML = ticketDetails.generatedTickets
-//     .map((ticket) => {
-//       // 🔑 FIX: Ensure we are only using the raw Base64 string for embedding.
-//       const rawBase64 = ticket.qrCodeBase64.startsWith("data:image")
-//         ? ticket.qrCodeBase64.split(",")[1] // Remove everything up to and including the comma
-//         : ticket.qrCodeBase64; // Use it as is if the prefix is not found
-
-//       // Use rawBase64 in the <img> tag
-
-//       return `
-//         <li style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;"> 
-//             <strong>Ticket No:</strong> ${ticket.number} <br>
-//             <strong style="margin-top: 10px 0;">Unique Token:</strong> ${ticket.token}
-//             
-//             <div style="text-align: center; margin-top: 10px;">
-//                 <img 
-//                     src="data:image/png;base64,${rawBase64}" 
-//                     alt="Ticket QR Code" 
-//                     style="width: 120px; height: 120px; border: 2px solid #ddd; display: block; margin: 5px auto;"
-//                 >
-//             </div>
-//         </li>
-//         `;
-//     })
-//     .join("");
-
-//   return `
-//     <html>
-//       <body 
-//         style="
-//         font-family: Arial, sans-serif;
-//         line-height: 1.6;
-//         color: #333;
-//         max-width: 600px;
-//         margin: 0 auto;
-//         padding: 20px;
-//       ">
-//        <div
-//           style="display: flex; justify-content: center; align-items: center; background-color: #045854; margin: 20px 0; padding: 20px;"
-//         >
-//           <img
-//             src="https://res.cloudinary.com/dgvucesc6/image/upload/Frame_2121455760_fj8zmx.png"
-//             alt="eventra"
-//              style="
-//             max-width: 700.3px;
-//             max-height: 43.92px;
-//             margin-bottom: 20px;
-//             border-radius: 5px;
-//           "
-//           />
-//         </div>
-          
-        
-
-//         <p style="font-size: 18px; color: #000000">
-//         <strong>Hello ${lastname},</strong>
-//       </p>
-
-//       <p>${ticketDetails.quantity} ${ticketDetails.ticketType} Tickets for the ${ticketDetails.eventName} were purchased by ${account} and sent to you.</p>
-//       <div
-//         style="
-//           background-color: #f3f6f8;
-//           padding: 10px;
-//           border-radius: 8px;
-//           margin: 20px 0;
-//         "
-//       >
-        
-        
-//         <h2>Event & Purchase Summary</h2>
-//                 <p><strong>Event:</strong> ${ticketDetails.eventName}</p>
-//                 <p><strong>Date & Time:</strong> ${displayDate}</p>
-//                 <p><strong>Ticket Type:</strong> ${ticketDetails.ticketType}</p>
-//                 <p><strong>Quantity:</strong> ${ticketDetails.quantity} ticket(s)</p>
-                
-//                 <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
-
-//                 <h3>Your Individual Ticket Details:</h3>
-//                 <ul style="list-style-type: none; padding-left: 0;">
-//                     ${ticketListHTML}
-//                 </ul>
-
-//                 <p style="margin-top: 25px;">
-//                     Please present one of the unique tokens/numbers above for entry. Check your dashboard for QR codes or PDF attachments.
-//                 </p>
-        
-        
-//         <p>Your tickets for ${ticketDetails.eventName} are now attach in  ${account}  dashboard.</p>
-//         <p>Thank you,<br>The Eventra Team</p>
-//       </div>
-//       </body>
-//     </html>
-//   `;
-// };
 const sendUserTicket = (lastname, ticketDetails, account) => {
   if (!ticketDetails || !Array.isArray(ticketDetails.generatedTickets)) {
     console.error(
@@ -920,12 +711,10 @@ const sendUserTicket = (lastname, ticketDetails, account) => {
               margin: 0 0 30px 0;
             ">
               Great news! <strong>${account}</strong> has purchased 
-              <strong>${ticketDetails.quantity} ${
-    ticketDetails.ticketType
-  }</strong> 
-              ticket(s) for <strong>${
-                ticketDetails.eventName
-              }</strong> and sent them to you.
+              <strong>${ticketDetails.quantity} ${ticketDetails.ticketType
+    }</strong> 
+              ticket(s) for <strong>${ticketDetails.eventName
+    }</strong> and sent them to you.
             </p>
 
             <!-- Event Summary Card -->
@@ -1058,7 +847,16 @@ const sendUserTicket = (lastname, ticketDetails, account) => {
   `;
 };
 
-module.exports = {
+export {
+  createWelcomeEmail,
+  resetEmailTemplate,
+  PaymentComfirmationEmail,
+  createAdminEmail,
+  contactEmailReply,
+  sendUserTicket,
+};
+
+export default {
   createWelcomeEmail,
   resetEmailTemplate,
   PaymentComfirmationEmail,

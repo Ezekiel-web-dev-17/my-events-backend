@@ -1,4 +1,4 @@
-const TicketInstance = require("../models/ticketIntanceSchema");
+import TicketInstance from "../models/ticketIntanceSchema.js";
 
 /**
  * Verify and update ticket status after QR scan.
@@ -104,4 +104,5 @@ const verifyTicketScan = async (req, res,next) => {
     }
 };
 
-module.exports = { verifyTicketScan };
+export { verifyTicketScan };
+export default { verifyTicketScan };

@@ -1,5 +1,5 @@
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 // Configure Google OAuth strategy
 passport.use(
@@ -38,3 +38,5 @@ passport.use(
 // Store user info in session
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
+
+export default passport;

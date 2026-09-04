@@ -1,5 +1,5 @@
-const Testimonial = require("../models/Testimonial.js")
-const cloudinary = require("cloudinary").v2;
+import Testimonial from "../models/Testimonial.js";
+import { v2 as cloudinary } from "cloudinary";
 
 
 const createTestimonial = async (req, res) => {
@@ -71,7 +71,13 @@ const deleteTestimonial = async (req, res) => {
 
 
 
-module.exports = {
+export {
+    createTestimonial,
+    getTestimonials,
+    deleteTestimonial,
+};
+
+export default {
     createTestimonial,
     getTestimonials,
     deleteTestimonial,

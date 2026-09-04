@@ -1,7 +1,7 @@
-const redisConfig = require("./redis");
+import redisConfig from "./redis.js";
 
 // Fetch coordinates from Nominatim for a given location string
-const geocodeLocation = async (location) => {
+export const geocodeLocation = async (location) => {
   const cacheKey = `geocode:${location.toLowerCase()}`;
 
   // 1. Check Redis cache first
@@ -48,4 +48,4 @@ const geocodeLocation = async (location) => {
 };
 
 // Export function so it can be reused in other files
-module.exports = geocodeLocation;
+export default geocodeLocation;

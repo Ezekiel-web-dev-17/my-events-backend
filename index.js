@@ -1,41 +1,45 @@
-require("dotenv").config();
-const express = require("express");
-const http = require("http");
-const app = express();
-const server = http.createServer(app);
-const { init } = require("./helpers/socketio.js"); // import your socket module
-const io = init(server); // initialize socket.io
-const cors = require("cors");
-const mongoose = require("mongoose");
-const fileupload = require("express-fileupload");
-const passport = require("passport");
-const session = require("express-session");
-const PORT = process.env.PORT || 5500;
+import "dotenv/config";
+import express from "express";
+import http from "http";
+import path from "path";
+import { fileURLToPath } from "url";
+import cors from "cors";
+import mongoose from "mongoose";
+import fileupload from "express-fileupload";
+import passport from "passport";
+import session from "express-session";
+import { v2 as cloudinary } from "cloudinary";
 
-require("./config/passport");
+import { init } from "./helpers/socketio.js";
+import "./config/passport.js";
 
-const cloudinary = require("cloudinary").v2;
-
-const userRoutes = require("./routes/userRoutes");
-const eventraRoutes = require("./routes/eventraRoutes");
-const eventRoutes = require("./routes/eventRoutes");
-const googleRoutes = require("./routes/googleRoutes");
-const contactRoutes = require("./routes/contactRoute");
-const testimonialRoutes = require("./routes/testimonialRoutes");
-
-const ticketRoutes = require("./routes/ticketRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
-const verifyQrcode = require("./routes/qrcode");
-const webhookRoutes = require("./routes/webhookRoute");
-const notificationRoutes = require("./routes/notificationRoutes");
+import userRoutes from "./routes/userRoutes.js";
+import eventraRoutes from "./routes/eventraRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import googleRoutes from "./routes/googleRoutes.js";
+import contactRoutes from "./routes/contactRoute.js";
+import testimonialRoutes from "./routes/testimonialRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import verifyQrcode from "./routes/qrcode.js";
+import webhookRoutes from "./routes/webhookRoute.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 // Import Error middleware to handle errors throughout the API.
-const errorMiddleware = require("./middleware/error");
+import errorMiddleware from "./middleware/error.js";
 // Import arcjet middleware to handle rate limiting throughout the API.
-const arcjetMiddleware = require("./middleware/arjectMiddleware");
-const redisConfig = require("./helpers/redis");
-const socketAuth = require("./middleware/socketMiddleware.js");
-const { isUser } = require("./middleware/auth.js");
+import arcjetMiddleware from "./middleware/arjectMiddleware.js";
+import redisConfig from "./helpers/redis.js";
+import socketAuth from "./middleware/socketMiddleware.js";
+import { isUser } from "./middleware/auth.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const server = http.createServer(app);
+const io = init(server);
+const PORT = process.env.PORT || 5500;
 
 // middleware
 app.use(express.json());
@@ -88,32 +92,37 @@ io.use(socketAuth(isUser));
 
 io.on("connection", (socket) => {
   socket.emit("connected", socket.user);
-  console.log(`User connected: ${socket.id} (${socket.user.firstname})`);
+  console.log(`User connected: ${socket.id} (${socket.user?.firstname || "User"})`);
 
   socket.on("adminRoom", (room) => {
-    if (room !== "admin") {
+    const role = socket.user?.role;
+    if (room !== "admin" || !["admin", "superAdmin"].includes(role)) {
       const err = new Error(
-        `Dear ${socket.user.firstname}, You are not allowed to join this chat room.`
+        `Dear ${socket.user?.firstname || "User"}, You are not allowed to join this chat room.`
       );
       socket.emit("error", err.message); // trigger the error event
       return;
     }
 
     socket.join(room);
-    io.to(room).emit("adminRoom", `${socket.user.firstname} joined ${room}`);
+    io.to(room).emit("adminRoom", `${socket.user?.firstname || "User"} joined ${room}`);
   });
 
   socket.on("adminMessage", ({ room, obj }) => {
     io.to(room).emit("adminMessage", {
-      user: socket.user.firstname,
+      user: socket.user?.firstname || "Admin",
       ...obj,
     });
   });
 
   socket.on("disconnect", () => {
-    console.log(`${socket.user.firstname} disconnected`);
+    console.log(`${socket.user?.firstname || "User"} disconnected`);
   });
 });
+
+// Serve static notification frontend
+app.use("/notifications-app", express.static(path.join(__dirname, "frontend")));
+app.use(express.static(path.join(__dirname, "frontend")));
 
 // error routes
 app.use("/", (req, res) => {
@@ -124,13 +133,10 @@ app.use(errorMiddleware);
 
 const startServer = async () => {
   try {
-    server.listen(PORT, () => {
-      console.log(`Listening on PORT ${PORT}`);
-    });
     redisConfig.flushall("ASYNC");
     await mongoose.connect(process.env.MONGO_URL, { dbName: "EVENTS-DB" });
-    app.listen(PORT, () => {
-      console.log(`App Running on PORT ${PORT}`);
+    server.listen(PORT, () => {
+      console.log(`Listening on PORT ${PORT}`);
     });
   } catch (error) {
     console.log(error);

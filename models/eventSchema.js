@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+import mongoose from "mongoose";
 
 /*--------------------------------------------------
 --------- DEMO EVENT TICKET TYPES SCHEMA -----------
@@ -183,4 +183,4 @@ eventSchema.index(
 // Compile model from schema
 const EVENTS = mongoose.model("Events", eventSchema);
 
-module.exports = EVENTS;
+export default EVENTS;

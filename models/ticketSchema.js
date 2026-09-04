@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 //  Ticket schema
 const TicketSchema = new mongoose.Schema(
@@ -65,4 +65,4 @@ TicketSchema.methods.isAvailable = function () {
 };
 
 const Ticket = mongoose.model("TicketMain", TicketSchema);
-module.exports = Ticket;
+export default Ticket;

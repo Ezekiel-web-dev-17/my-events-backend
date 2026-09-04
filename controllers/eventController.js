@@ -1,24 +1,21 @@
 // Import mongoose utility for starting sessions (used for transactions)
-const { startSession, default: mongoose } = require("mongoose");
+import mongoose, { startSession } from "mongoose";
 
 // Import the main dayjs library
-const dayjs = require("dayjs");
+import dayjs from "dayjs";
 
 // Import the plugins we need for event date and time
-// timezone plugin -> lets you work with specific timezones
-const tz = require("dayjs/plugin/timezone");
-
-// utc plugin -> lets you handle UTC conversions
-const utc = require("dayjs/plugin/utc");
+import tz from "dayjs/plugin/timezone.js";
+import utc from "dayjs/plugin/utc.js";
 
 // Import Event model (MongoDB schema for events)
-const EVENTS = require("../models/eventSchema.js");
+import EVENTS from "../models/eventSchema.js";
 
-const redisConfig = require("../helpers/redis");
-const geocodeLocation = require("../helpers/locator.js");
+import redisConfig from "../helpers/redis.js";
+import geocodeLocation from "../helpers/locator.js";
 
 // Import Cloudinary for image uploads
-const cloudinary = require("cloudinary").v2;
+import { v2 as cloudinary } from "cloudinary";
 
 // Register (extend) the plugins with dayjs so they can be used
 dayjs.extend(utc);
@@ -541,7 +538,20 @@ const deleteEvent = async (req, res, next) => {
 /* ========================
    EXPORT CONTROLLERS
    ======================== */
-module.exports = {
+export {
+  getAllEvents,
+  getAllUpComingEvents,
+  getEventById,
+  getDraftEvents,
+  getLiveEvents,
+  createEvents,
+  filterEvent,
+  updateEvent,
+  cancelEvent,
+  deleteEvent,
+};
+
+export default {
   getAllEvents,
   getAllUpComingEvents,
   getEventById,
