@@ -1,12 +1,15 @@
-const router = require("express").Router();
-const {
+import express from "express";
+import {
   deleteNotification,
   getAllUnreadNotifications,
   getAllNotifications,
   markAsRead,
-} = require("../controllers/notifications");
-const { isUser, isAdmin, isSuperAdmin } = require("../middleware/auth");
-const cache = require("../middleware/redisMiddleware");
+  markAllAsRead,
+} from "../controllers/notifications.js";
+import { isUser, isAdmin, isSuperAdmin } from "../middleware/auth.js";
+import cache from "../middleware/redisMiddleware.js";
+
+const router = express.Router();
 
 router.get(
   "/",
@@ -17,6 +20,7 @@ router.get(
 );
 router.get("/unread", isUser, isAdmin, getAllUnreadNotifications);
 router.patch("/mark/:id", isUser, isAdmin, markAsRead);
+router.patch("/mark-all", isUser, isAdmin, markAllAsRead);
 router.delete("/delete/:id", isUser, isAdmin, isSuperAdmin, deleteNotification);
 
-module.exports = router;
+export default router;

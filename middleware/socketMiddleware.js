@@ -14,4 +14,4 @@ const socketAuth = (middleware) => (socket, next) => {
   });
 };
 
-module.exports = socketAuth;
+export default socketAuth;

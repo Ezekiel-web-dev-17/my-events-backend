@@ -1,17 +1,17 @@
-const redisConfig = require("../helpers/redis");
-const Notification = require("../models/notificationSchema");
-const { getIO } = require("../helpers/socketio.js");
-const io = getIO();
+import redisConfig from "../helpers/redis.js";
+import Notification from "../models/notificationSchema.js";
+import { getIO } from "../helpers/socketio.js";
 
 const createNotification = async (body) => {
   try {
     const { title, content, about } = body;
 
-    if (!title || !content || !about)
-      return res.status(400).json({
+    if (!title || !content || !about) {
+      return {
         success: false,
-        message: "All fields are required",
-      });
+        message: "All fields (title, content, about) are required",
+      };
+    }
 
     const newNotification = await Notification.create({
       title,
@@ -21,7 +21,7 @@ const createNotification = async (body) => {
 
     await redisConfig.flushall("ASYNC");
 
-    return { success: true };
+    return { success: true, notification: newNotification };
   } catch (error) {
     const err = new Error(error);
     return { success: false, message: err.message };
@@ -39,26 +39,25 @@ const makeMessage = async (
   if (!createdNotify.success) return createdNotify.message;
 
   console.log("Message sent and notification created successfully.");
-  io.to("admin").emit("adminMessage", {
-    user: "EVENTRA API",
-    ...msgObj,
-    createdAt: Date.now(),
-  });
+  try {
+    const io = getIO();
+    io.to("admin").emit("adminMessage", {
+      user: "EVENTRA API",
+      ...msgObj,
+      createdAt: Date.now(),
+    });
+  } catch (socketErr) {
+    console.error("Socket emit failed in makeMessage:", socketErr.message);
+  }
 };
 
 const getAllNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.find({});
-
-    if (!notifications.length)
-      return res.status(404).json({
-        success: false,
-        message: "No Notification found",
-      });
+    const notifications = await Notification.find({}).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      notifications,
+      notifications: notifications || [],
     });
   } catch (error) {
     next(error);
@@ -67,17 +66,13 @@ const getAllNotifications = async (req, res, next) => {
 
 const getAllUnreadNotifications = async (req, res, next) => {
   try {
-    const unreadNotifications = await Notification.find({ unread: true });
-
-    if (!unreadNotifications.length)
-      return res.status(404).json({
-        success: false,
-        message: "All caught up. No unread Notification",
-      });
+    const unreadNotifications = await Notification.find({
+      views: { $ne: req.user._id },
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      unreadNotifications,
+      unreadNotifications: unreadNotifications || [],
     });
   } catch (error) {
     next(error);
@@ -93,7 +88,7 @@ const markAsRead = async (req, res, next) => {
       });
 
     if (!["admin", "superAdmin"].includes(req.user.role))
-      return res.status(402).json({
+      return res.status(403).json({
         success: false,
         message: "Access denied. Only admins can read notifications",
       });
@@ -106,7 +101,11 @@ const markAsRead = async (req, res, next) => {
         message: `Notification not found.`,
       });
 
-    if (notification.views.includes(req.user.id))
+    const alreadyRead = notification.views.some(
+      (v) => v.toString() === req.user._id.toString()
+    );
+
+    if (alreadyRead)
       return res.status(400).json({
         success: false,
         message: "Notification has been read before now.",
@@ -121,7 +120,24 @@ const markAsRead = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Notification marked as read successfully",
-      info: `${notification.views}`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const markAllAsRead = async (req, res, next) => {
+  try {
+    await Notification.updateMany(
+      { views: { $ne: req.user._id } },
+      { $push: { views: req.user._id } }
+    );
+
+    await redisConfig.flushall("ASYNC");
+
+    res.status(200).json({
+      success: true,
+      message: "All notifications marked as read successfully",
     });
   } catch (error) {
     next(error);
@@ -154,14 +170,29 @@ const deleteNotification = async (req, res, next) => {
         success: false,
         message: "Resource not found",
       });
+
+    res.status(200).json({
+      success: true,
+      message: "Notification deleted successfully",
+    });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = {
+export {
   makeMessage,
   markAsRead,
+  markAllAsRead,
+  getAllNotifications,
+  getAllUnreadNotifications,
+  deleteNotification,
+};
+
+export default {
+  makeMessage,
+  markAsRead,
+  markAllAsRead,
   getAllNotifications,
   getAllUnreadNotifications,
   deleteNotification,

@@ -1,4 +1,5 @@
-// socket.js
+import { Server } from "socket.io";
+
 let io;
 
 const allowedOrigins = [
@@ -7,22 +8,23 @@ const allowedOrigins = [
   "http://127.0.0.1:5500",
 ];
 
-module.exports = {
-  init: (server) => {
-    const socketio = require("socket.io")(server, {
-      cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"],
-        credentials: true,
-      },
-    });
-    io = socketio;
-    return io;
-  },
-  getIO: () => {
-    if (!io) {
-      throw new Error("Socket.io not initialized!");
-    }
-    return io;
-  },
+export const init = (server) => {
+  const socketio = new Server(server, {
+    cors: {
+      origin: allowedOrigins,
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
+  });
+  io = socketio;
+  return io;
 };
+
+export const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io not initialized!");
+  }
+  return io;
+};
+
+export default { init, getIO };
