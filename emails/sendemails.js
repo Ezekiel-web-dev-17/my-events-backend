@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { sendEmail } from "./mailer.js";
 import {
   createWelcomeEmail,
   resetEmailTemplate,
@@ -6,49 +6,9 @@ import {
   sendUserTicket,
   createAdminEmail,
 } from "./emailtemplate.js";
-import sgMail from "@sendgrid/mail";
+import { FRONTEND_URL, FRONTEND_TICKET } from "../config/config.js";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const sendEmail = async ({ to, subject, html }) => {
-  const msg = {
-    to,
-    from: process.env.EMAIL, // must be a verified sender in SendGrid
-    subject,
-    html
-  };
-
-  try {
-    const info = await sgMail.send(msg);
-    console.log(`Email sent successfully: ${info[0].statusCode}`);
-  } catch (error) {
-    console.error("Error sending email:", error);
-    if (error.response) {
-      console.error(error.response.body);
-    }
-  }
-};
-
-// const sendEmail = async ({ to, subject, html }) => {
-//   const transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//       user: process.env.EMAIL,
-//       pass: process.env.PASSWORD,
-//     },
-//   });
-//   try {
-//     const info = await transporter.sendMail({
-//       from: process.env.EMAIL,
-//       to: to,
-//       subject: subject,
-//       html: html,
-//     });
-//     console.log(`email sent ${info.response} `);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 const sendWelcomeEmail = async ({ firstname, clientUrl, email }) => {
   const subject = "Welcome to Eventra";
@@ -88,8 +48,8 @@ const sendPaymentConfirmationEmail = async ({
   amount,
   currency,
   ticketDetails,
-  clientBaseUrl = (process.env.FRONTEND_URL).replace(/\/$/, ""),
-  frontendRoute = process.env.FRONTEND_TICKET
+  clientBaseUrl = (FRONTEND_URL || "http://localhost:5500").replace(/\/$/, ""),
+  frontendRoute = FRONTEND_TICKET || "/dashboard/tickets"
 }) => {
   const subject = "Your Purchase Confirmation ";
   const ticketUrl = `${clientBaseUrl}${frontendRoute}`;

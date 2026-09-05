@@ -3,13 +3,14 @@
 // we store frequently accessed data in Redis and fetch it from the cache first.
 
 import Redis from "ioredis"; // Import Redis client (ioredis library)
+import { REDIS_USERNAME, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } from "../config/config.js";
 
 // Create a Redis client instance with connection details from environment variables
 const redisConfig = new Redis({
-  username: process.env.REDIS_USERNAME, // Redis username (if required by provider)
-  host: process.env.REDIS_HOST, // Redis server host address
-  port: Number(process.env.REDIS_PORT), // Redis server port (convert from string to number)
-  password: process.env.REDIS_PASSWORD, // Redis password for authentication
+  username: REDIS_USERNAME, // Redis username (if required by provider)
+  host: REDIS_HOST || "127.0.0.1", // Redis server host address
+  port: Number(REDIS_PORT) || 6379, // Redis server port
+  password: REDIS_PASSWORD, // Redis password for authentication
 });
 
 // Event listener: fires when connection to Redis is established

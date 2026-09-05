@@ -1,13 +1,14 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, BACKEND_URL } from "./config.js";
 
 // Configure Google OAuth strategy
 passport.use(
     new GoogleStrategy(
         {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: "http://localhost:5500/auth/google/callback",
+            clientID: GOOGLE_CLIENT_ID,
+            clientSecret: GOOGLE_CLIENT_SECRET,
+            callbackURL: `${BACKEND_URL || "http://localhost:5500"}/auth/google/callback`,
         },
         async (accessToken, refreshToken, profile, done) => {
             try {

@@ -10,12 +10,13 @@ import {
 import { generateTicketInstances } from "../helpers/ticketInstance.js";
 import redirectToFrontend from "../helpers/redirect.js";
 import { makeMessage } from "./notifications.js";
+import { PAYSTACK_SECRET_KEY, BACKEND_URL } from "../config/config.js";
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
-const paystack = require("paystack")(process.env.PAYSTACK_SECRET_KEY);
+const paystack = require("paystack")(PAYSTACK_SECRET_KEY);
 
-const baseUrl = process.env.BACKEND_URL.replace(/\/$/, "");
+const baseUrl = (BACKEND_URL || "http://localhost:5500").replace(/\/$/, "");
 
 const handlePaymentInitialization = async (req, res, next) => {
   const { quantity: Quantity, firstname, lastname, email } = req.body;

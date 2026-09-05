@@ -2,6 +2,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/usersSchema.js";
 import { sendGoogleWelcomeEmail } from "../emails/googleSendMail.js";
+import { JWT_SECRET, FRONTEND_URL } from "../config/config.js";
 
 /**
  * Handles the Google OAuth callback.
@@ -12,12 +13,10 @@ const googleCallback = async (req, res) => {
   try {
     const { googleId, firstname, lastname, emails } = req.user;
 
-
-
     // Create temporary token valid for 30 minutes
     const tempToken = jwt.sign(
       { googleId, firstname, lastname, emails },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "30m" }
     );
 
@@ -25,7 +24,7 @@ const googleCallback = async (req, res) => {
       // Only one email: skip "choose email" step
       const chosenEmail = emails[0];
       return res.redirect(
-        `${process.env.FRONTEND_URL}/finalize-google?token=${tempToken}&chosenEmail=${encodeURIComponent(
+        `${FRONTEND_URL}/finalize-google?token=${tempToken}&chosenEmail=${encodeURIComponent(
           chosenEmail
         )}`
       );
@@ -33,7 +32,7 @@ const googleCallback = async (req, res) => {
 
     // Multiple emails: frontend will ask user to choose one
     return res.redirect(
-      `${process.env.FRONTEND_URL}/choose-email?token=${tempToken}&emails=${encodeURIComponent(
+      `${FRONTEND_URL}/choose-email?token=${tempToken}&emails=${encodeURIComponent(
         JSON.stringify(emails)
       )}`
     );
@@ -46,11 +45,11 @@ const googleCallback = async (req, res) => {
   if (!user.isVerified) {
     const verificationToken = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    const clientUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+    const clientUrl = `${FRONTEND_URL}/verify-email/${verificationToken}`;
 
     await sendWelcomeEmail({
       email: user.email,
@@ -81,7 +80,7 @@ const finalizeGoogle = async (req, res) => {
 
   try {
     // Decode temp token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     const emails = decoded.emails || [];
 
     let emailToUse;
@@ -123,10 +122,10 @@ const finalizeGoogle = async (req, res) => {
     }
 
     // Generate authentication tokens
-    const loginToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const loginToken = jwt.sign({ id: user._id }, JWT_SECRET, {
       expiresIn: "1h",
     });
-    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const refreshToken = jwt.sign({ id: user._id }, JWT_SECRET, {
       expiresIn: "7d",
     });
 

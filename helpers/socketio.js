@@ -1,9 +1,10 @@
 import { Server } from "socket.io";
+import { FRONTEND_URL } from "../config/config.js";
 
 let io;
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
+  FRONTEND_URL || "http://localhost:5500",
   "http://localhost:5173",
   "http://127.0.0.1:5500",
 ];

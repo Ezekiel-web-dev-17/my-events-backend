@@ -1,8 +1,10 @@
-const baseUrl = (process.env.FRONTEND_URL || "http://localhost:5500").replace(/\/$/, "");
-const FRONTEND_STATUS_PATH = process.env.FRONTEND_STATUS_PATH || "";
+import { FRONTEND_URL, FRONTEND_STATUS_PATH } from "../config/config.js";
+
+const baseUrl = (FRONTEND_URL || "http://localhost:5500").replace(/\/$/, "");
+const statusPath = FRONTEND_STATUS_PATH || "";
 
 export const redirectToFrontend = (res, status, ref, ticketId = null) => {
-  let url = `${baseUrl}${FRONTEND_STATUS_PATH}?reference=${encodeURIComponent(ref)}&status=${encodeURIComponent(status)}`;
+  let url = `${baseUrl}${statusPath}?reference=${encodeURIComponent(ref)}&status=${encodeURIComponent(status)}`;
 
   if (status === "success" && ticketId) {
     url += `&ticketId=${encodeURIComponent(ticketId)}`;

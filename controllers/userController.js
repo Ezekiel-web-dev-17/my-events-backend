@@ -9,6 +9,7 @@ import {
   sendResetEmail,
   sendAdminEmail,
 } from "../emails/sendemails.js";
+import { FRONTEND_URL, JWT_SECRET } from "../config/config.js";
 
 // registration controller
 const handleRegister = async (req, res) => {
@@ -36,7 +37,7 @@ const handleRegister = async (req, res) => {
       verificationToken,
       verificationTokenExpires,
     });
-    const clientUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+    const clientUrl = `${FRONTEND_URL}/verify-email/${verificationToken}`;
     await sendWelcomeEmail({
       email: user.email,
       firstname: user.firstname,
@@ -111,7 +112,7 @@ const userLogin = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: "1 days" }
     );
     res.status(200).json({
@@ -160,7 +161,7 @@ const resendVerificationEmail = async (req, res) => {
     user.verificationTokenExpires = tokenExpires;
     await user.save();
 
-    const clientUrl = `${process.env.FRONTEND_URL}/verify-email/${newToken}`;
+    const clientUrl = `${FRONTEND_URL}/verify-email/${newToken}`;
 
     await sendWelcomeEmail({
       email: user.email,
@@ -197,7 +198,7 @@ const handleForgotPassword = async (req, res) => {
     await user.save();
 
     //send the mail
-    const clientUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    const clientUrl = `${FRONTEND_URL}/reset-password/${token}`;
     await sendResetEmail({
       firstname: user.firstname,
       email: user.email,

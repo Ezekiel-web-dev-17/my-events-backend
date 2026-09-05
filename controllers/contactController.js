@@ -1,26 +1,6 @@
-import nodemailer from "nodemailer";
 import { contactEmailReply } from "../emails/emailtemplate.js";
-import sgMail from "@sendgrid/mail";
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const sendEmail = async ({ to, subject, html }) => {
-  const msg = {
-    to,
-    from: process.env.EMAIL, // must be a verified sender in SendGrid
-    subject,
-    html,
-  };
-
-  try {
-    const info = await sgMail.send(msg);
-    console.log(`Email sent successfully: ${info[0].statusCode}`);
-  } catch (error) {
-    console.error("Error sending email:", error);
-    if (error.response) {
-      console.error(error.response.body);
-    }
-  }
-};
+import { sendEmail } from "../emails/mailer.js";
+import { ADMIN_EMAIL, EMAIL } from "../config/config.js";
 
 export const handleContactForm = async (req, res) => {
   try {
@@ -34,7 +14,7 @@ export const handleContactForm = async (req, res) => {
 
     await sendEmail({
       from: email,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL,
+      to: ADMIN_EMAIL || EMAIL,
       subject: `📩 New Contact Form Message from ${name}`,
       html: `
         <p><strong>Name:</strong> ${name}</p>
@@ -44,7 +24,7 @@ export const handleContactForm = async (req, res) => {
     });
 
     await sendEmail({
-      from: process.env.EMAIL,
+      from: EMAIL,
       to: email,
       subject: " Message Received",
       html: contactEmailReply(name),

@@ -1,8 +1,7 @@
 // Import JSON Web Token library
 import jwt from "jsonwebtoken";
-
-// Import User model
 import USER from "../models/usersSchema.js";
+import { JWT_SECRET } from "../config/config.js";
 
 /* ========================
    MIDDLEWARE: Check if User
@@ -25,7 +24,7 @@ export const isUser = async (req, res, next) => {
     token = authHeader.split(" ")[1];
 
     // verify token to get payload
-    const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodeToken = jwt.verify(token, JWT_SECRET);
 
     // If decoding fails (invalid or expired token) → reject
     if (!decodeToken)

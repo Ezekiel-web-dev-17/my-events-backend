@@ -1,9 +1,10 @@
 import crypto from "crypto";
 import { processSuccessfulPayment } from "../helpers/verifyPaymentSuccess.js";
 import { sendPaymentConfirmationEmail } from "../emails/sendemails.js";
+import { PAYSTACK_SECRET_KEY } from "../config/config.js";
 
 export const handleWebhookNotification = async (req, res, next) => {
-  const secret = process.env.PAYSTACK_SECRET_KEY;
+  const secret = PAYSTACK_SECRET_KEY;
   const hash = crypto
     .createHmac("sha512", secret)
     .update(JSON.stringify(req.body))

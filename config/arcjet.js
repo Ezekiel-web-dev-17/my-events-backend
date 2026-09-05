@@ -1,9 +1,10 @@
 import arcjet, { shield, detectBot, tokenBucket } from "@arcjet/node";
+import { ARCJET_KEY } from "./config.js";
 
 // Create an Arcjet instance with configuration
 const aj = arcjet({
   // API key (from Arcjet dashboard) stored in environment variable
-  key: process.env.ARCJET_KEY,
+  key: ARCJET_KEY,
 
   // "characteristics" tells Arcjet what to use for identifying clients.
   // Here: by source IP address
