@@ -52,7 +52,12 @@ const paymentSchema = new mongoose.Schema({
     },
     paidAt: Date,
     gatewayResponse: Object,
+    authorizationUrl: { type: String }, // Stored on init for idempotency replay
+    processingStartedAt: Date,
 }, { timestamps: true });
+
+// Fast lookup for the idempotency guard in handlePaymentInitialization
+paymentSchema.index({ user: 1, ticket: 1, status: 1 });
 
 const PAYMENT = mongoose.model("ticketPayment", paymentSchema);
 export default PAYMENT;

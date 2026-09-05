@@ -88,6 +88,29 @@ const handlePaymentInitialization = async (req, res, next) => {
 
     // Calculate total amount
     const totalAmount = ticket.price * requestedQuantity; // Generate secure reference
+
+    // --- IDEMPOTENCY GUARD ---
+    // If a pending payment already exists for this user + ticket, return the
+    // original checkout URL instead of creating a new Paystack transaction.
+    const existingPending = await paymentSchema.findOne({
+      user: userId,
+      ticket: ticketId,
+      status: "pending",
+    });
+
+    if (existingPending) {
+      return res.status(200).json({
+        status: "success",
+        message: "Payment already initialized. Use the existing checkout link.",
+        data: {
+          authorization_url: existingPending.authorizationUrl,
+          reference: existingPending.reference,
+          amount: existingPending.amount,
+          paymentId: existingPending._id,
+        },
+      });
+    }
+
     const reference = `TKT_${ticketId}_${Date.now()}_${userId}`;
 
     const response = await paystack.transaction.initialize({
@@ -126,6 +149,7 @@ const handlePaymentInitialization = async (req, res, next) => {
       amount: totalAmount,
       quantity: requestedQuantity,
       status: "pending",
+      authorizationUrl: response.data.authorization_url, // Persist for idempotency replay
     });
 
     res.status(200).json({
