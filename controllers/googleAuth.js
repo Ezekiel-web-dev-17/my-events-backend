@@ -49,7 +49,7 @@ const googleCallback = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    const clientUrl = `${FRONTEND_URL}/verify-email/${verificationToken}`;
+    const clientUrl = `${FRONTEND_URL}/api/auth/verify-email/${verificationToken}`;
 
     await sendWelcomeEmail({
       email: user.email,

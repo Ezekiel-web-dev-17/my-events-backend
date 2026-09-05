@@ -37,7 +37,8 @@ const handleRegister = async (req, res) => {
       verificationToken,
       verificationTokenExpires,
     });
-    const clientUrl = `${FRONTEND_URL}/verify-email/${verificationToken}`;
+    // Link points to backend API route — update FRONTEND_URL in .env if a frontend app handles this page
+    const clientUrl = `${FRONTEND_URL}/api/auth/verify-email/${verificationToken}`;
     await sendWelcomeEmail({
       email: user.email,
       firstname: user.firstname,
@@ -161,7 +162,7 @@ const resendVerificationEmail = async (req, res) => {
     user.verificationTokenExpires = tokenExpires;
     await user.save();
 
-    const clientUrl = `${FRONTEND_URL}/verify-email/${newToken}`;
+    const clientUrl = `${FRONTEND_URL}/api/auth/verify-email/${newToken}`;
 
     await sendWelcomeEmail({
       email: user.email,
@@ -198,7 +199,8 @@ const handleForgotPassword = async (req, res) => {
     await user.save();
 
     //send the mail
-    const clientUrl = `${FRONTEND_URL}/reset-password/${token}`;
+    // Token is passed as a query param so the frontend/API can read it via req.query.token
+    const clientUrl = `${FRONTEND_URL}/api/auth/reset-password?token=${token}`;
     await sendResetEmail({
       firstname: user.firstname,
       email: user.email,
@@ -219,9 +221,10 @@ const handleForgotPassword = async (req, res) => {
 // Reset Password controller
 
 const handleResetPassword = async (req, res) => {
-  const { token, password } = req.body;
+  const token = req.body.token || req.query.token || req.params.token;
+  const { password } = req.body;
   if (!token || !password) {
-    return res.status(400), json({ message: "Provide token and new password" });
+    return res.status(400).json({ message: "Provide token and new password" });
   }
   try {
     const user = await USER.findOne({
