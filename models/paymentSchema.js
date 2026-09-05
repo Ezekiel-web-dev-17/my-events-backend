@@ -56,8 +56,17 @@ const paymentSchema = new mongoose.Schema({
     processingStartedAt: Date,
 }, { timestamps: true });
 
-// Fast lookup for the idempotency guard in handlePaymentInitialization
-paymentSchema.index({ user: 1, ticket: 1, status: 1 });
+// DB-level enforcer: only ONE pending payment allowed per user+ticket at a time.
+// The partial filter means the uniqueness constraint ONLY applies while status === "pending".
+// Once a payment resolves (success/failed), the slot is freed and the user can repurchase.
+paymentSchema.index(
+  { user: 1, ticket: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: "pending" },
+    name: "unique_pending_payment_per_user_ticket",
+  }
+);
 
 const PAYMENT = mongoose.model("ticketPayment", paymentSchema);
 export default PAYMENT;

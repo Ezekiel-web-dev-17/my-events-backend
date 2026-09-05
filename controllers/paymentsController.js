@@ -87,78 +87,138 @@ const handlePaymentInitialization = async (req, res, next) => {
     }
 
     // Calculate total amount
-    const totalAmount = ticket.price * requestedQuantity; // Generate secure reference
+    const totalAmount = ticket.price * requestedQuantity;
 
-    // --- IDEMPOTENCY GUARD ---
-    // If a pending payment already exists for this user + ticket, return the
-    // original checkout URL instead of creating a new Paystack transaction.
-    const existingPending = await paymentSchema.findOne({
-      user: userId,
-      ticket: ticketId,
-      status: "pending",
-    });
+    // --- ATOMIC IDEMPOTENCY GUARD (Phase 1: Claim the slot) ---
+    // Uses findOneAndUpdate + upsert so the check and creation are a SINGLE
+    // atomic DB operation. Concurrent requests race here — only one can insert.
+    //
+    // $setOnInsert: fields only written if this is a NEW document (the winner).
+    // If the document already exists, MongoDB returns it untouched (the loser).
+    const reference = `TKT_${ticketId}_${Date.now()}_${userId}`;
 
-    if (existingPending) {
-      return res.status(200).json({
-        status: "success",
-        message: "Payment already initialized. Use the existing checkout link.",
-        data: {
-          authorization_url: existingPending.authorizationUrl,
-          reference: existingPending.reference,
-          amount: existingPending.amount,
-          paymentId: existingPending._id,
+    let rawResult;
+    try {
+      rawResult = await paymentSchema.findOneAndUpdate(
+        // Filter: the "one pending payment per user+ticket" slot
+        { user: userId, ticket: ticketId, status: "pending" },
+        {
+          $setOnInsert: {
+            email,
+            firstname,
+            lastname,
+            reference,
+            user: userId,
+            ticket: ticketId,
+            event: event._id,
+            amount: totalAmount,
+            quantity: requestedQuantity,
+            status: "pending",
+            // authorizationUrl filled in Phase 2 below
+          },
         },
+        { upsert: true, new: false, rawResult: true }
+      );
+    } catch (err) {
+      // E11000: partial unique index caught a concurrent winner at DB level.
+      // Fetch and return the already-created record.
+      if (err.code === 11000) {
+        const existing = await paymentSchema.findOne({
+          user: userId,
+          ticket: ticketId,
+          status: "pending",
+        });
+        if (existing?.authorizationUrl) {
+          return res.status(200).json({
+            status: "success",
+            message: "Payment already initialized. Use the existing checkout link.",
+            data: {
+              authorization_url: existing.authorizationUrl,
+              reference: existing.reference,
+              amount: existing.amount,
+              paymentId: existing._id,
+            },
+          });
+        }
+        // Winner hasn't written the URL yet — ask client to retry in a moment
+        return res.status(202).json({
+          status: "pending",
+          message: "Payment is being initialized. Please retry in a moment.",
+        });
+      }
+      throw err;
+    }
+
+    // rawResult.lastErrorObject.updatedExisting === true  → we are the LOSER
+    // rawResult.lastErrorObject.updatedExisting === false → we are the WINNER
+    const alreadyExisted = rawResult.lastErrorObject?.updatedExisting === true;
+
+    if (alreadyExisted) {
+      // We lost the race — return the existing pending record
+      const existing = rawResult.value; // the doc that was already there (new:false)
+      if (existing?.authorizationUrl) {
+        return res.status(200).json({
+          status: "success",
+          message: "Payment already initialized. Use the existing checkout link.",
+          data: {
+            authorization_url: existing.authorizationUrl,
+            reference: existing.reference,
+            amount: existing.amount,
+            paymentId: existing._id,
+          },
+        });
+      }
+      // Edge: winner exists but hasn't written the URL yet — client should retry
+      return res.status(202).json({
+        status: "pending",
+        message: "Payment is being initialized. Please retry in a moment.",
       });
     }
 
-    const reference = `TKT_${ticketId}_${Date.now()}_${userId}`;
-
+    // --- Phase 2: We are the WINNER — call Paystack and hydrate the record ---
     const response = await paystack.transaction.initialize({
       email,
       amount: totalAmount * 100, // Convert to kobo
-      reference: reference,
+      reference,
       callback_url: `${baseUrl}/api/payments/verify`,
       metadata: {
         user: userId,
-        email: email,
+        email,
         ticket: ticketId,
-        event: event._id.toString(), // ⬅️ IMPORTANT: Pass the event ID in metadata
+        event: event._id.toString(),
         quantity: requestedQuantity,
-        firstname: firstname,
-        lastname: lastname,
+        firstname,
+        lastname,
       },
     });
 
     if (!response.status || !response.data) {
+      // Paystack failed — delete the placeholder so the user can retry cleanly
+      await paymentSchema.deleteOne({ reference });
       console.error("Paystack Initialization Failed:", response);
       return res.status(400).json({
         status: "fail",
-        message:
-          response.message || "Failed to initialize payment with Paystack.",
+        message: response.message || "Failed to initialize payment with Paystack.",
       });
     }
 
-    const payment = await paymentSchema.create({
-      user: userId,
-      email: email,
-      firstname: firstname,
-      lastname: lastname,
-      ticket: ticketId,
-      event: event._id, // ⬅️ IMPORTANT: Save the Event ID on the Payment record
-      reference,
-      amount: totalAmount,
-      quantity: requestedQuantity,
-      status: "pending",
-      authorizationUrl: response.data.authorization_url, // Persist for idempotency replay
-    });
+    // Hydrate the placeholder with the real Paystack data
+    const payment = await paymentSchema.findOneAndUpdate(
+      { reference },
+      {
+        authorizationUrl: response.data.authorization_url,
+        gatewayResponse: response.data,
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       status: "success",
-      message: "Payment initialized. redirect user to the checkout page",
+      message: "Payment initialized. Redirect user to the checkout page.",
       data: {
         authorization_url: response.data.authorization_url,
         access_code: response.data.access_code,
-        reference: reference,
+        reference,
         amount: totalAmount,
         paymentId: payment._id,
       },
